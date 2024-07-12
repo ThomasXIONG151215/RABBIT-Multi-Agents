@@ -10,7 +10,15 @@ import dashscope
 from dashscope import MultiModalConversation
 from http import HTTPStatus
 
+from langchain.prompts import PromptTemplate
+from langchain.chains import LLMChain, SimpleSequentialChain, SequentialChain
+from langchain_experimental.agents.agent_toolkits import create_python_agent
+from langchain_experimental.tools.python.tool import PythonREPLTool
+from langchain.agents.agent_types import AgentType
+from langchain.utilities import WikipediaAPIWrapper
+
 os.environ["DASHSCOPE_API_KEY"] = "sk-a36dbf13c32f4b28a7dfc3ba81275fa8"
+
 
 data = {
     'Temperature (°C)': np.random.uniform(20, 30, size=30),
@@ -121,7 +129,9 @@ st.button('开始分析', on_click=clicked, args=[1])
 if st.session_state.clicked[1]:
     st.subheader('开始分析')
     
-    @st.cache_data
+    @st.cache_data #保存结构化数据结果；出来的结果每次都是新的，不会因为前面一个session变过它，后面它就变
+    #它会每次单独把计算结果做一个copy，所以不同的用户使用该函数并对函数结果进行修改都会得到相同结果
+    #但是cache_resource是反过来，它不做任何copy，上线后大家看到的都是一样的。
     def answer_one_question():
         steps_eda = langchain_llm('What are the steps of EDA?')
         return steps_eda
@@ -151,18 +161,117 @@ if st.session_state.clicked[1]:
         
         trends = agent_data_analysit.run(f'帮我分析下{user_chosen_variable}的趋势')
         st.write(trends)
-        
-        
+    
         return
+    
+    @st.cache_resource #保存的是非结构化数据，你不想重复加载的database connections，所以你session更新后它会保留前面的变化
+    def wiki(prompt):
+        wiki_research = WikipediaAPIWrapper().run(prompt)
+        return wiki_research
+    
+    @st.cache_data
+    def prompt_templated():
+        data_problem_prompt_template = PromptTemplate(
+            input_variables=['problem'],
+            template='Convert the following problem into a data science problem:{problem}'
+        )
+        
+        model_selection_prompt_template = PromptTemplate(
+            input_variables=['data_problem'],
+            template='List the name of the machine learning algorithms (only the name) that are suitable to solve this problem:{data_problem}, while using this Wikipedia research:{wiki_research}'
+        )
+        
+        return data_problem_prompt_template, model_selection_prompt_template
+    
+    @st.cache_data
+    def chains():
+        data_problem_chain = LLMChain(llm=langchain_llm, 
+                                      prompt=prompt_templated()[0],
+                                      verbose=True,
+                                      output_key='data_problem',
+                                      )
+        
+        model_selection_chain = LLMChain(llm=langchain_llm,
+                                      prompt=prompt_templated()[1],
+                                      verbose=True,
+                                      output_key='model_selection'
+                                      )
+        
+        sequential_chain = SequentialChain(chains=[data_problem_chain, model_selection_chain],
+                                                 input_variables=['problem','wiki_research'],
+                                                 #output_key=['data_problem', 'model_selection'],
+                                                 verbose=True,
+                                                 #chain_type="stuff"
+                                                 )
+    
+        return sequential_chain
+    
+    @st.cache_data
+    def list_to_selectbox(my_model_selection):
+        algorithm_lines = my_model_selection.split('\n')
+        algorithms = [algorithm.split(':')[-1].split('.')[-1].strip() for algorithm in algorithm_lines if algorithm.strip()]
+        algorithms.insert(0, "选择算法")
+        formatted_list_output = [f"{algorithm}" for algorithm in algorithms if algorithm]
+        return formatted_list_output
+    
+    def chains_output(prompt, wiki_research):
+        my_chain = chains()
+        my_chain_output = my_chain({"problem": prompt, "wiki_research": wiki_research})
+        my_data_problem = my_chain_output['problem']
+        my_model_selection = my_chain_output['model_selection']
+        return my_data_problem, my_model_selection
+
+    @st.cache_resource
+    def python_agent():
+        agent_executor = create_python_agent(
+            llm=langchain_llm,
+            tool=PythonREPLTool(),
+            verbose=True,
+            agent_type=AgentType.ZERO_SHOT_REACT_DESCRIPTION,
+            handle_parsing_errors=True,
+
+        )
+        return agent_executor
+
+    @st.cache_data
+    def python_solution(my_data_problem, selected_algorithm, user_csv):
+        
+        solution = python_agent().run(f"Write a python script to solve this: {my_data_problem}, using this algorithm:{selected_algorithm} using this dataset {user_csv}")
+    
+        return solution
     
     with st.expander('数据分析'):
         question = '请解释下每列数据含义'
-        columns_meaning = agent_data_analysit.run(question)
-        st.write(columns_meaning)
-        data_analysis()
+        #columns_meaning = agent_data_analysit.run(question)
+        st.write('解释')
+        #st.write(columns_meaning)
+        #data_analysis()
     
     with st.expander('回答问题'):
-        st.write(answer_one_question())
+        #st.write(answer_one_question())
 
         user_chosen_variable = st.selectbox("选择你所感兴趣的参数",options=df.columns, index = 0)
-        function_question_variable()
+        #function_question_variable()
+
+        data_problem_prompt_template, model_selection_prompt_template = prompt_templated()
+        
+        prompt = st.text_area('请输入你感兴趣的问题')
+        if prompt:
+            wiki_research = wiki(prompt)
+            my_data_problem, my_model_selection = chains_output(prompt, wiki_research)
+            #response = sequential_chain({'problem': prompt})
+            st.write(my_data_problem)
+            st.write(my_model_selection)
+            #st.write(response['model_selection'])
+            formatted_list = list_to_selectbox(my_model_selection)
+            selected_algorithm = st.selectbox("选择机器学习算法", formatted_list)
+            
+            
+            if selected_algorithm is not None and selected_algorithm != "选择算法":
+                
+                solution = python_solution(my_data_problem, selected_algorithm, df)
+                st.write(solution)
+            
+            
+            
+        
