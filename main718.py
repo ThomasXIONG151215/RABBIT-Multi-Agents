@@ -1,24 +1,9 @@
 import streamlit as st 
 import os 
 import pandas as pd 
-import numpy as np
-from langchain.llms import openai, tongyi 
-from langchain_community.llms import Tongyi
-from langchain_community.llms.moonshot import Moonshot
-from langchain_experimental.agents import create_pandas_dataframe_agent
 from openai import OpenAI
-import dashscope
-from dashscope import MultiModalConversation
-from http import HTTPStatus
 import plotly.graph_objects as go
-import requests
 from dataset import df
-from langchain.chains import LLMChain, SimpleSequentialChain, SequentialChain
-from langchain_experimental.agents.agent_toolkits import create_python_agent
-from langchain_experimental.tools.python.tool import PythonREPLTool
-from langchain.agents.agent_types import AgentType
-from langchain.utilities import WikipediaAPIWrapper
-import streamlit.components.v1 as components
 from chat_tools import data_analysis, manual_chat
 import datetime
 from langchain_community.document_loaders import UnstructuredMarkdownLoader
@@ -36,6 +21,25 @@ st.set_page_config(
    initial_sidebar_state="expanded",
 )
 st.title('星际植物工厂AI助手')
+
+st.image("mars_pfal.png", caption="未来火星城市植物工厂")
+
+st.divider()
+
+col1, col2 = st.columns(2)
+
+# 在第一列中显示第一张图片
+with col1:
+    st.write('**1号种植舱**')
+    st.info('滚筒式结构｜意大利生菜')
+    st.image('canopy1.jpg', use_column_width=True)
+
+# 在第二列中显示第二张图片
+with col2:
+    st.write('**2号种植舱**')
+    st.info('平板式结构｜翠恬生菜')
+    st.image('canopy2.jpg', use_column_width=True)
+
 st.divider()
 
 # Sidebar with star system information
@@ -44,9 +48,14 @@ with st.sidebar:
     st.text('当前位置：银河系')
     st.text('星际坐标：X:1234 Y:5678 Z:91011')
 
+    st.image("mars_city.jpeg", caption="今日未来火星城")
+
     apod_url = "nasa_pic1.jpeg"
 
-    st.image(apod_url, caption='今日舱外风景', use_column_width=True)
+    st.image(apod_url, caption='今日卫星捕捉风景', use_column_width=True)
+
+
+
 
 if 'clicked' not in st.session_state:
     st.session_state.clicked = {1: False}
@@ -56,6 +65,11 @@ if 'new_info' not in st.session_state:
     st.session_state.new_info = ""
 
 state_new_info = st.session_state.new_info
+
+if 'ai_assistant_suggestion' not in st.session_state:
+    st.session_state.ai_assistant_suggestion = ""
+
+ai_assistant_suggestion = st.session_state.ai_assistant_suggestion
 
 #function to update the value in session state
 def clicked(button):
@@ -95,22 +109,6 @@ st.header('数据总览')
 
 with st.expander('**数据表**'):
     st.write(df)
-
-with st.expander("查看图片"):
-    # 创建两列
-    col1, col2 = st.columns(2)
-
-    # 在第一列中显示第一张图片
-    with col1:
-        st.write('**1号种植舱**')
-        st.info('滚筒式结构｜意大利生菜')
-        st.image('canopy1.jpg', use_column_width=True)
-
-    # 在第二列中显示第二张图片
-    with col2:
-        st.write('**2号种植舱**')
-        st.info('平板式结构｜翠恬生菜')
-        st.image('canopy2.jpg', use_column_width=True)
 
 
 with st.expander('**环境数据**'):
@@ -199,7 +197,7 @@ with st.expander('能耗数据'):
 
 st.header('嫦娥兔 AI Agent工作区')
 
-ai_analyst, ai_assistant, ai_mechanist = st.tabs(['AI数据分析师','AI助理农艺师','AI机械工程师'])
+ai_analyst, ai_assistant, ai_mechanist = st.tabs(['AI数据分析师','AI助理农艺师','AI执行工程师'])
 
 with ai_analyst:
     st.subheader('交互问答')
@@ -223,37 +221,8 @@ with ai_analyst:
 
     st.subheader('保存新知识')
     store_info = st.button('按下保存分析结果作为新知识')
-    with st.expander('保存新知识'):
-        if store_info:
-            store_txt(state_new_info) #只是保存，还没有清零当前状态
-
-
-    def test_dify_client():
-        import requests
-        import json 
- 
-        
-        url = "https://api.dify.ai/v1/chat-messages"
-
-        headers = {
-            'Authorization': 'Bearer app-hTghItxhCBRwRUwhOVu7b8s6',
-            'Content-Type': 'application/json',
-        }
-
-        data = {
-            "inputs": {},
-            "query": "如何种植意大利生菜?",
-            "response_mode": "streaming",
-            "conversation_id":"",
-            "user": "abc-123" 
-        }
-        response = requests.post(url, headers=headers, data=json.dumps(data))
-
-        with st.chat_message("assistant"):
-            st.write(response.json())
-    #if st.button('test dify'):
-    #    test_dify_client()
-    
+    if store_info:
+        store_txt(state_new_info) #只是保存，还没有清零当前状态
 
 def moonshot_super_user_prompt(): #ai助理农艺师根据上一个步骤的ai数据分析师的分析结果生成的下一步提示词。
     super_prompt = "你是一个认真，专注，积极向上的助理农艺师，\
@@ -269,13 +238,40 @@ def moonshot_super_user_prompt(): #ai助理农艺师根据上一个步骤的ai�
 import httpx 
 from typing import *
 from pathlib import Path
-#上下文缓存应用
 
+
+#直接一个prompt解决问题形式的rag
+@st.cache_resource
+def direct_caching(doc_list):
+    to_read_content = ""
+    for doc in doc_list:
+
+        markdown_path = f"knowledge/{doc}"
+        loader = UnstructuredMarkdownLoader(markdown_path)
+
+        data = loader.load()
+        assert len(data) == 1
+        assert isinstance(data[0], Document)
+        readme_content = data[0].page_content
+
+        to_read_content += readme_content
+    
+    return to_read_content
+
+
+#上下文缓存应用形式的rag
+@st.cache_resource
 def moonshot_caching(doc_list, cache_tag):
-    client = OpenAI(
-        base_url="https://api.moonshot.cn/v1",
-        api_key=os.environ["MOONSHOT_API_KEY"]
-    )
+    """
+    :param files: 一个包含要上传文件的路径的列表，路径可以是绝对路径也可以是相对路径，请使用字符串
+        的形式传递文件路径。
+    :param cache_tag: 设置 Context Caching 的 tag 值，你可以将 tag 理解为自定义的 Cache 名称，
+        当你设置了 cache_tag 的值，就意味着启用 Context Caching 功能，默认缓存时间是 300 秒，每次
+        携带缓存进行 `/v1/chat/completions` 请求都将刷新缓存存活时间（300 秒）。
+    :return: 一个包含了文件内容或文件缓存的 messages 列表，请将这些 messages 加入到 Context 中，
+        即请求 `/v1/chat/completions` 接口时的 messages 参数中。
+    """
+    
     messages = []
 
     # 对每个文件路径，我们都会上传文件并抽取文件内容，最后生成一个 role 为 system 的 message，并加入
@@ -284,7 +280,7 @@ def moonshot_caching(doc_list, cache_tag):
         file_path = f"knowledge/{doc}"
         file_object = client.files.create(file=Path(file_path),purpose="file-extract")
         file_content = client.files.content(file_id=file_object.id).text
-        message.append({
+        messages.append({
             "role":"system",
             "content": file_content,
         })
@@ -297,7 +293,7 @@ def moonshot_caching(doc_list, cache_tag):
                        json={
                            "model": "moonshot-v1",
                            "messages": messages,
-                           "ttl": 300,
+                           "ttl": 300, #缓存时间（秒），可以延长
                            "tags": [cache_tag],
                        })
         if r.status_code != 200:
@@ -307,7 +303,10 @@ def moonshot_caching(doc_list, cache_tag):
 
 with ai_assistant: 
     st.write('人类工程师直接表明下一步想解决的问题，在进行RAG之前就缩小文档知识范围帮助准确提炼')
-
+    client = OpenAI(
+        base_url="https://api.moonshot.cn/v1",
+        api_key=os.environ["MOONSHOT_API_KEY"]
+    )
     label_list = st.multiselect('选择标签',['培训操作','提升生菜产能','改善番茄种植','节能增效','调整光照'])
 
     doc_list = []
@@ -325,8 +324,6 @@ with ai_assistant:
             if doc not in doc_list:
                 doc_list.append(doc)
 
-    #st.success(f'这一环节适合的文档有{[doc for doc in doc_list]}')
-
     docs_md = '\n'.join([f'- {doc}' for doc in doc_list])
 
     avatar = ':material/cruelty_free:'
@@ -334,42 +331,153 @@ with ai_assistant:
     further_prompt = st.chat_input('请进一步标明想要解决的问题')
     if further_prompt:
 
-        message = st.chat_message(name="ai",
+        message_bar = st.chat_message(name="ai",
                                 avatar=avatar
                                 )
         
-        message.markdown(f'这一环节适合的文档有:\n{docs_md}')
-        message.success('启动moonshot上下文缓存功能吸取选定文档内容')
+        message_bar.markdown(f'这一环节适合的文档有:\n{docs_md}')
+        message_bar.success('启动moonshot上下文缓存功能吸取选定文档内容')
 
-        to_read_content = ""
-        for doc in doc_list:
+        moonshot_caching_rag_content = moonshot_caching(doc_list=doc_list,
+                                                 cache_tag='test'
+                                                 )
+        direct_caching_rag_content = direct_caching(doc_list)
+        input_messages = [
+            #*moonshot_caching_rag_content,
+            {
+            "role":"system",
+            "content": direct_caching_rag_content,
+            },   
+            {
+                "role": "system",
+            "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。你会为用户提供安全，有帮助，"
+                       "准确的回答。同时，你会拒绝一切涉及恐怖主义，种族歧视，黄色暴力等问题的回答。Moonshot AI 为专有名词，不"
+                       "可翻译成其他语言。",
+            },
+            {
+                "role": "user",
+                "content": f"你是一个认真，专注，积极向上的助理农艺师，\
+                            最近的种植情况是这样子的{state_new_info},\
+                            目前我们想解决的问题在这个字符串数组当中{label_list},\
+                            具体的问题则是{further_prompt},\
+                            希望你从这些上下文的问题中中提炼出可能有帮助的信息\
+                            你提供的信息最多两百个字。\
+                            "
+            }]
 
-            markdown_path = f"knowledge/{doc}"
-            loader = UnstructuredMarkdownLoader(markdown_path)
-
-            data = loader.load()
-            assert len(data) == 1
-            assert isinstance(data[0], Document)
-            readme_content = data[0].page_content
-
-            to_read_content += readme_content
+        completion = client.chat.completions.create(
+            model="moonshot-v1-128k",
+            messages=input_messages,
+        )
+        ai_assistant_suggestion = completion.choices[0].message.content
+        message_bar.write(ai_assistant_suggestion)
 
 
-    
+def optimal_conditions_plot(name,values_right,values_left, show_legend):
+# 创建条形图
+    fig = go.Figure()
+
+    # 添加向右展开的条形图
+    fig.add_trace(go.Bar(
+        x=values_right,
+        y=labels,
+        name=f'理想水平',
+        orientation='h',
+        marker_color='rgba(50, 171, 96, 0.6)',  # 右侧条形图颜色
+        width=0.2,
+    ))
+
+    # 添加向左展开的条形图
+    fig.add_trace(go.Bar(
+        x=values_left,
+        y=labels,
+        name=f'实际水平',
+        orientation='h',
+        marker_color='rgba(245, 130, 48, 0.6)',  # 左侧条形图颜色
+        width=0.2,
+    ))
+
+    # 更新布局以适应左右展开的条形图
+    fig.update_layout(
+        barmode='relative',  # 设置为相对模式，以便条形图可以向两边展开
+        xaxis=dict(showticklabels=False),  # 设置x轴为线性模式
+        title_text=f'{name}理想条件与当前条件对比',  # 图表标题
+        showlegend=show_legend,  # 显示图例
+        width=400,
+        height=600
+    )
+    return fig
 
 
+def moonshot_short_summarize(info_to_sum):
+    input_messages = [
+            {
+                "role": "system",
+            "content": "你是 Kimi，由 Moonshot AI 提供的人工智能助手，你更擅长中文和英文的对话。"
+            },
+            {
+                "role": "user",
+                "content": f"\
+                            总结下这段话{info_to_sum}\
+                            你提供的信息最多两百个字。\
+                            "
+            }]
 
-    #st.write(to_read_content)
+    completion = client.chat.completions.create(
+        model="moonshot-v1-128k",
+        messages=input_messages,
+    )
+    summarized_text = completion.choices[0].message.content
 
-    with st.expander('语音交互框'):
-        components.iframe("https://webdemo-global.agora.io/example/basic/basicLive/index.html",
-                                    height=400,
-                                    scrolling=True)
+    return summarized_text
 
-                    
+
 with ai_mechanist:
+    st.subheader('当前已知的品种特性')
+    st.write('这里呈现通过长短期累积下来的种植经验判断的果蔬品种最喜欢的环境条件，人类工程师可以在这里和AI执行工程师继续调整环境控制系统')
+
+    # 示例数据
+    labels = ['湿度(%)', '温度(C)', 'CO2浓度(ppm)', '光强(mm/m2.s)']
+    oak_optimal = [3, 4, 4, 2]  # 向右展开的条形图数据
+    oak_current = [-1, -3, -3, -1.8]  # 向左展开的条形图数据
+
+    romaine_optimal = [5, 2, 5, 1]  # 向右展开的条形图数据
+    romaine_current = [-4, -3, -4.5, -0.8]  # 向左展开的条形图数据
+
+    oak_fig = optimal_conditions_plot("意大利生菜",oak_optimal,oak_current, False)
+    romaine_fig = optimal_conditions_plot("红罗马生菜", romaine_optimal, romaine_current, True)
+
+    col1, col2 = st.columns(2)
+    with col1:
+    # 在Streamlit中显示图
+        st.plotly_chart(oak_fig)
+    with col2:
+        st.plotly_chart(romaine_fig)
+
+    with st.expander('AI数据分析师与AI助理农艺师的分析建议'):
+        if state_new_info!="":
+            #完成一整个流程的设定后就可以把session state清零了
+            st.write("AI数据分析师的建议")
+            analyst_message_bar = st.chat_message(name="AI数据分析师",
+                                    avatar=avatar)
+            
+            analyst_summarize = moonshot_short_summarize(state_new_info)
+
+            analyst_message_bar.write(analyst_summarize)
+
+        if ai_assistant_suggestion!="":
+            st.write("AI助理农艺师的建议")
+            assistant_message_bar = st.chat_message(name="AI助理农艺师",
+                                    avatar=avatar)
+            assistant_summarize = moonshot_short_summarize(ai_assistant_suggestion)
+            assistant_message_bar.write(assistant_summarize)
+
+    st.subheader('控制面板')
+
+
+
+
     if st.button('清零状态信息'):
-        #完成一整个流程的设定后就可以把session state清零了
-        state_new_info = ""  
+        state_new_info = ""
                     
                 

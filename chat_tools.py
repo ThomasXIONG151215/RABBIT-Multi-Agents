@@ -55,8 +55,8 @@ def data_analysis():
     message = st.chat_message(name="ai",
                                 avatar=avatar
                                 )
-    answer2 = agent_data_analyst.run(preset_question2)
-    message.write_stream(answer2)
+    answer2 = agent_data_analyst.run(preset_question2+"，请做出批判性评价")
+    message.write(answer2)
     #text_to_audio(missing_values)
 
     preset_question3 = "**当前室内温度对作物的影响如何？**"
