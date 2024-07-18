@@ -1,33 +1,40 @@
-import pandas as pd 
 import numpy as np
+import pandas as pd
 
-data = { 'Indoor Temperature (°C)': np.random.uniform(20, 30, size=30), 
-        #'Outdoor Temperature (°C)': np.random.uniform(15, 25, size=30), 
-        'Indoor Humidity (%)': np.random.uniform(40, 60, size=30), 
-        #'Outdoor Humidity (%)': np.random.uniform(30, 50, size=30), 
-        'CO2 (ppm)': np.random.uniform(300, 500, size=30), 
-        'PM2.5 (µg/m³)': np.random.uniform(0, 50, size=30), 
-        'VOC (ppm)': np.random.uniform(0, 1, size=30), 
-        'LED PPFD (µmol/m²/s)': np.random.uniform(100, 400, size=30), 
-        'Water pH': np.random.uniform(5.5, 6.5, size=30), 
-        'EC (dS/m)': np.random.uniform(1.0, 2.5, size=30), 
-        'LED Energy Consumption (kWh)': np.random.uniform(20, 100, size=30), 
-        'AC Energy Consumption (kWh)': np.random.uniform(50, 200, size=30), 
-        'Water Pump Energy Consumption (kWh)': np.random.uniform(10, 50, size=30), 
-        'Outdoor Temperature (°C)': np.random.uniform(-70, 20, size=30),  # Mars temperature range
-    'Atmospheric Pressure (hPa)': np.random.uniform(30, 100, size=30),  # Mars atmospheric pressure
-    'Outdoor Humidity (%)': np.random.uniform(0, 10, size=30),       # Mars humidity is very low
-    'Dust Concentration (µg/m³)': np.random.uniform(0, 1000, size=30), # Dust storms can be common
-    'Solar Irradiance (W/m²)': np.random.uniform(150, 590, size=30),  # Solar irradiance on Mars
-        }
+#np.random.seed(0)  # 为了可重复性设置随机种子
+
 n_observations = 30
-# 生成生长速率数据，这里假设单位是毫米/天
-growth_rate_mm_per_day = np.random.uniform(0.1, 5, size=n_observations)
+data = {
+    'Indoor Temperature (°C)': np.random.normal(loc=25, scale=2, size=n_observations),
+    'Indoor Humidity (%)': np.random.normal(loc=50, scale=5, size=n_observations),
+    'CO2 (ppm)': np.random.normal(loc=400, scale=50, size=n_observations),
+    'PM2.5 (µg/m³)': np.random.normal(loc=25, scale=10, size=n_observations),
+    'VOC (ppm)': np.random.normal(loc=0.5, scale=0.1, size=n_observations),
+    'LED PPFD (µmol/m²/s)': np.random.normal(loc=250, scale=50, size=n_observations),
+    'Water pH': np.random.normal(loc=6, scale=0.2, size=n_observations),
+    'EC (dS/m)': np.random.normal(loc=1.5, scale=0.25, size=n_observations),
+    'LED Energy Consumption (kWh)': np.random.normal(loc=60, scale=10, size=n_observations),
+    'AC Energy Consumption (kWh)': np.random.normal(loc=125, scale=25, size=n_observations),
+    'Water Pump Energy Consumption (kWh)': np.random.normal(loc=30, scale=5, size=n_observations),
+    'Outdoor Temperature (°C)': np.random.normal(loc=-20, scale=25, size=n_observations),
+    'Atmospheric Pressure (hPa)': np.random.normal(loc=65, scale=10, size=n_observations),
+    'Outdoor Humidity (%)': np.random.normal(loc=5, scale=2, size=n_observations),
+    'Dust Concentration (µg/m³)': np.random.normal(loc=500, scale=250, size=n_observations),
+    'Solar Irradiance (W/m²)': np.random.normal(loc=370, scale=50, size=n_observations),
+}
 
-# 生成收获指数数据，这里假设是比例
-harvest_index = np.random.uniform(0.2, 0.8, size=n_observations)
+# 生成增长速率数据，使用布朗运动模型
+growth_rate_mm_per_day = np.cumsum(np.random.normal(loc=0.5, scale=0.3, size=n_observations))
+growth_rate_mm_per_day2 = np.cumsum(np.random.normal(loc=0.5, scale=0.3, size=n_observations))
 
-# 这里我们假设 data 是已存在的字典或数据框，我们将把生成的数据加入其中
+# 生成收获指数数据，保证它是累积且在合理范围内
+harvest_index = np.minimum(np.cumsum(np.random.uniform(0, 0.1, size=n_observations)) + 0.2, 0.8)
+harvest_index2 = np.minimum(np.cumsum(np.random.uniform(0, 0.1, size=n_observations)) + 0.2, 0.8)
+
+# 将生成的数据加入到data字典中
 data['Growth Rate (mm/day)'] = growth_rate_mm_per_day
 data['Harvest Index'] = harvest_index
+data['Growth Rate2 (mm/day)'] = growth_rate_mm_per_day2
+data['Harvest Index2'] = harvest_index2
+
 df = pd.DataFrame(data)

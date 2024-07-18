@@ -16,13 +16,16 @@ os.environ["MOONSHOT_API_KEY"] = "sk-wQJ6rfZixFKs8eKyPmAzXBfS1qdObnPbCIEoMyr6nq3
 
 st.set_page_config(
    page_title="Mars PFAL AI App",
-   page_icon="🧊",
+   page_icon="🥬",
    layout="wide",
    initial_sidebar_state="expanded",
 )
-st.title('星际植物工厂AI助手')
+st.title('🥬🤖星际植物工厂AI助手')
 
-st.image("mars_pfal.png", caption="未来火星城市植物工厂")
+st.write("**未来火星城植物工厂**")
+st.image("mars_pfal.png", 
+         #caption="未来火星城植物工厂"
+         )
 
 st.divider()
 
@@ -53,8 +56,6 @@ with st.sidebar:
     apod_url = "nasa_pic1.jpeg"
 
     st.image(apod_url, caption='今日卫星捕捉风景', use_column_width=True)
-
-
 
 
 if 'clicked' not in st.session_state:
@@ -106,20 +107,70 @@ def store_txt(new_info):
     st.info('新知识已成功保存')
 
 st.header('数据总览')
-
+ 
 with st.expander('**数据表**'):
     st.write(df)
 
 
-with st.expander('**环境数据**'):
-#st.write('**数据图**')
+with st.expander('**数据可视化数据**'):
+
+    canopy_fig = go.Figure()
+    canopy_fig.add_trace(go.Scatter(x=df.index, y=df['Growth Rate (mm/day)'],
+                            mode='lines', name='1号种植舱植物长势',
+                            line=dict(color='rgb(255, 99, 71)')))
+    canopy_fig.add_trace(go.Scatter(x=df.index, y=df['Growth Rate2 (mm/day)'],
+                            mode='lines', name='2号种植舱植物长势',
+                            line=dict(color='rgb(255, 99, 71)')))
+    canopy_fig.update_layout(
+        showlegend=True,  # 显示图例
+        legend=dict(
+            orientation="h",  # 图例水平排列
+            x=0.05,  # 图例的x坐标
+            y=-0.2,  # 图例的y坐标
+            traceorder="normal",
+            font=dict(size=16),  # 改变图例字体大小
+        ),
+        #margin=dict(l=0, r=0, t=0, b=0),  # 移除边距，使图表紧贴容器
+        #autosize=True,  # 自动调整大小
+        uniformtext_minsize=12,  # 统一文本的最小尺寸
+        #uniformtext_mode='hide',  # 如果文本重叠则隐藏
+        #title=dict(text="能耗饼图", font=dict(size=20)),  # 标题及字体大小
+    )
+    canopy_fig.update_layout(width=500, height=300) 
+    #Growth Rate (mm/day)
+
+
+    index_fig = go.Figure()
+    index_fig.add_trace(go.Scatter(x=df.index, y=df['Harvest Index'],
+                            mode='lines', name='1号种植舱收成指数',
+                            line=dict(color='rgb(255, 99, 71)')))
+    index_fig.add_trace(go.Scatter(x=df.index, y=df['Harvest Index2'],
+                            mode='lines', name='2号种植舱收成指数',
+                            line=dict(color='rgb(255, 99, 71)')))
+    index_fig.update_layout(
+        showlegend=True,  # 显示图例
+        legend=dict(
+            orientation="h",  # 图例水平排列
+            x=0.05,  # 图例的x坐标
+            y=-0.2,  # 图例的y坐标
+            traceorder="normal",
+            font=dict(size=16),  # 改变图例字体大小
+        ),
+        #margin=dict(l=0, r=0, t=0, b=0),  # 移除边距，使图表紧贴容器
+        #autosize=True,  # 自动调整大小
+        uniformtext_minsize=12,  # 统一文本的最小尺寸
+        #uniformtext_mode='hide',  # 如果文本重叠则隐藏
+        #title=dict(text="能耗饼图", font=dict(size=20)),  # 标题及字体大小
+    )
+    index_fig.update_layout(width=500, height=300) 
+    #Growth Rate (mm/day)
 
     fig1 = go.Figure()
     fig1.add_trace(go.Scatter(x=df.index, y=df['Indoor Temperature (°C)'],
                             mode='lines', name='室内温度',
                             line=dict(color='rgb(255, 99, 71)')))
     fig1.add_trace(go.Scatter(x=df.index, y=df['Outdoor Temperature (°C)'],
-                            mode='lines', name='室外温度',
+                            mode='lines', name='火星温度',
                             line=dict(color='rgb(135, 206, 235)')))
     fig1.update_layout(
         showlegend=True,  # 显示图例
@@ -136,15 +187,15 @@ with st.expander('**环境数据**'):
         #uniformtext_mode='hide',  # 如果文本重叠则隐藏
         #title=dict(text="能耗饼图", font=dict(size=20)),  # 标题及字体大小
     )
-    fig1.update_layout(width=1000, height=600) 
-    st.plotly_chart(fig1)
+    fig1.update_layout(width=500, height=300) 
+    
 
     fig2 = go.Figure()
     fig2.add_trace(go.Scatter(x=df.index, y=df['Indoor Humidity (%)'],
                             mode='lines', name='室内湿度',
                             line=dict(color='rgb(255, 165, 0)')))
     fig2.add_trace(go.Scatter(x=df.index, y=df['Outdoor Humidity (%)'],
-                            mode='lines', name='室外湿度',
+                            mode='lines', name='火星湿度',
                             line=dict(color='rgb(0, 191, 255)')))
     fig2.update_layout(
         showlegend=True,  # 显示图例
@@ -161,20 +212,20 @@ with st.expander('**环境数据**'):
         uniformtext_mode='hide',  # 如果文本重叠则隐藏
         #title=dict(text="能耗饼图", font=dict(size=20)),  # 标题及字体大小
     )
-    st.plotly_chart(fig2)
+    fig2.update_layout(width=500, height=300) 
+    
 
-with st.expander('能耗数据'):
     data = {
-'Energy Type': ['LED Energy Consumption (kWh)', 'AC Energy Consumption (kWh)', 'Water Pump Energy Consumption (kWh)'],
+'Energy Type': ['LED能耗 (kWh)', '空调能耗 (kWh)', '水泵能耗 (kWh)'],
 'Energy Consumption': [100, 200, 150]
 }
     df = pd.DataFrame(data)
 
     # 创建Plotly Pie Chart
-    fig = go.Figure(data=[go.Pie(labels=df['Energy Type'], values=df['Energy Consumption'])])
+    fig_pie = go.Figure(data=[go.Pie(labels=df['Energy Type'], values=df['Energy Consumption'])])
 
     # 更新图表布局
-    fig.update_layout(
+    fig_pie.update_layout(
         showlegend=True,  # 显示图例
         legend=dict(
             orientation="h",  # 图例水平排列
@@ -189,10 +240,16 @@ with st.expander('能耗数据'):
         uniformtext_mode='hide',  # 如果文本重叠则隐藏
         #title=dict(text="能耗饼图", font=dict(size=20)),  # 标题及字体大小
     )
+    fig_pie.update_layout(width=500, height=600) 
 
-    # 在Streamlit中显示图表
-    st.plotly_chart(fig)
-
+    col1, col2 = st.columns(2)
+    with col1:
+        st.plotly_chart(canopy_fig)
+        st.plotly_chart(fig1)
+        st.plotly_chart(fig2)
+    with col2:
+        st.plotly_chart(index_fig)
+        st.plotly_chart(fig_pie)
         
 
 st.header('嫦娥兔 AI Agent工作区')
@@ -473,11 +530,34 @@ with ai_mechanist:
             assistant_message_bar.write(assistant_summarize)
 
     st.subheader('控制面板')
+    st.write('根据前面的长期经验和最新知识，AI执行工程师可以自行调控设备参数，持续优化植物生长条件')
+    def controller(type_of, name, value, max_value):
+        if type_of == 'slider':
+            st.slider(name, value=value, max_value=max_value, min_value=0)
+        elif type_of == 'input':
+            st.number_input(name, value=value, max_value=max_value, min_value=0)
 
+    ac_powers, led_powers, pH_set, EC_set, Arm_freq, CO2_ppm = 30, 40, 3, 4, 29,800
+    max_ac_powers, max_led_powers, max_pH_set,max_EC_set, max_Arm_freq, max_CO2_ppm = 100, 100, 6, 14, 60,2000
 
+    col1, col2 = st.columns(2)
 
+    with col1:
+        controller('input','空调输出强度', ac_powers, max_ac_powers)
+        controller('input', 'LED灯光强', led_powers, max_led_powers)
+        controller('slider', 'CO2浓度', CO2_ppm, max_CO2_ppm)
+
+    with col2:
+        controller('slider', 'LED灯光强', led_powers, max_led_powers)
+        controller('slider', '营养液pH值', pH_set, max_pH_set)
+        controller('slider', '营养液EC值', EC_set, max_EC_set)
+    
+    controller('slider', '机械臂运作采收周期', Arm_freq, max_Arm_freq) 
+
+    update_button = st.button("执行工程师自动调整控制参数")
+
+    
 
     if st.button('清零状态信息'):
         state_new_info = ""
                     
-                

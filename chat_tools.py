@@ -4,23 +4,10 @@ from langchain.prompts import PromptTemplate
 import streamlit as st 
 import os 
 import pandas as pd 
-import numpy as np
-from langchain.llms import openai, tongyi 
 from langchain_community.llms import Tongyi
 from langchain_community.llms.moonshot import Moonshot
 from langchain_experimental.agents import create_pandas_dataframe_agent
-from openai import OpenAI
-import dashscope
 from dashscope import MultiModalConversation
-from http import HTTPStatus
-import plotly.graph_objects as go
-
-from langchain.chains import LLMChain, SimpleSequentialChain, SequentialChain
-from langchain_experimental.agents.agent_toolkits import create_python_agent
-from langchain_experimental.tools.python.tool import PythonREPLTool
-from langchain.agents.agent_types import AgentType
-from langchain.utilities import WikipediaAPIWrapper
-import streamlit.components.v1 as components
 from dataset import df
 
 os.environ["DASHSCOPE_API_KEY"] = "sk-a36dbf13c32f4b28a7dfc3ba81275fa8"
