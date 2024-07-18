@@ -23,7 +23,7 @@ st.set_page_config(
 st.title('🥬🤖星际植物工厂AI助手')
 
 st.write("**未来火星城植物工厂**")
-st.image("mars_pfal.png", 
+st.image("./images/mars_pfal.png", 
          #caption="未来火星城植物工厂"
          )
 
@@ -35,27 +35,25 @@ col1, col2 = st.columns(2)
 with col1:
     st.write('**1号种植舱**')
     st.info('滚筒式结构｜意大利生菜')
-    st.image('canopy1.jpg', use_column_width=True)
+    st.image('./images/canopy1.jpg', use_column_width=True)
 
 # 在第二列中显示第二张图片
 with col2:
     st.write('**2号种植舱**')
     st.info('平板式结构｜翠恬生菜')
-    st.image('canopy2.jpg', use_column_width=True)
+    st.image('./images/canopy2.jpg', use_column_width=True)
 
 st.divider()
 
-# Sidebar with star system information
+# Sidebar with star system information 
 with st.sidebar:
     st.header('星际方位')
     st.text('当前位置：银河系')
     st.text('星际坐标：X:1234 Y:5678 Z:91011')
 
-    st.image("mars_city.jpeg", caption="今日未来火星城")
+    st.image("./images/mars_city.jpeg", caption="今日未来火星城")
 
-    apod_url = "nasa_pic1.jpeg"
-
-    st.image(apod_url, caption='今日卫星捕捉风景', use_column_width=True)
+    st.image("./images/nasa_pic1.jpeg", caption='今日卫星捕捉风景', use_column_width=True)
 
 
 if 'clicked' not in st.session_state:

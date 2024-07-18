@@ -1,7 +1,19 @@
 <div align="center">
- <img alt="ASTRA" height="auto" src="cover.jpeg">
+<div align="center">
+ <img alt="ASTRA" height="auto" src="./images/cover2.png">
 </div>
 
+<a href="">
+<span>植物工厂自动运营</span>
+</a>
+<span>&nbsp;&nbsp;•&nbsp;&nbsp;</span>
+<a href="">
+<span>多智能体协同操作</span>
+</a>
+
+
+
+</div>
 
 * **主题**：帮助人类在星际穿越中找到适宜的生存地，并确保宇航员能持续获取新鲜食物。（ Cornfield Chase |星际穿越 ）
 * **愿景**：利用植物工厂技术，在外太空飞船和未来殖民地城市中生产粮食，提供无污染、无农药的果蔬。
