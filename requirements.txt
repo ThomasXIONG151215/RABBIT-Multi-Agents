@@ -89,6 +89,7 @@ pexpect
 pickleshare
 Pillow
 platformdirs
+plotly
 pooch
 portalocker
 prompt-toolkit
