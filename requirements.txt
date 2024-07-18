@@ -79,6 +79,7 @@ numpy
 oauthlib
 omegaconf
 opencv-python
+openai
 opt-einsum
 oss2
 packaging
