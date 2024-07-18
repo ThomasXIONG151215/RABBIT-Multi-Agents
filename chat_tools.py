@@ -23,7 +23,6 @@ moonshot_llm = Moonshot(model="moonshot-v1-128k")
 
 agent_data_analyst = create_pandas_dataframe_agent(langchain_llm, df, verbose=True,allow_dangerous_code=True)
 
-
 @st.cache_data 
 def data_analysis():
     preset_question1 = "**这里是否缺失数据?**"

@@ -252,7 +252,7 @@ with st.expander('**数据可视化数据**'):
         st.plotly_chart(fig_pie)
         
 
-st.header('嫦娥兔 AI Agent工作区')
+st.header('AI Agent工作区')
 
 ai_analyst, ai_assistant, ai_mechanist = st.tabs(['AI数据分析师','AI助理农艺师','AI执行工程师'])
 
