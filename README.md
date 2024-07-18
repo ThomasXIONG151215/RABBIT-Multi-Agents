@@ -29,8 +29,9 @@
     * LLM 大模型：包括 Moonshot 上下文长文本缓存和通义千问数理统计分析。
     * RAG 检索：原创的解决问题导向范围可控 RAG。
     * 前端与部署：使用 Zeabur 和 Gamma。
-    * 2D 设计：采用 Midjourney 和 Light Year AI。
-    * 3D 设计：使用 Tripo AI 和 HyperHuman。
+    * AIGC 设计：[采用 Midjourney，Light Year AI，Tripo AI 以及 HyperHuman](https://rcnct1jfor65.feishu.cn/docx/A8CMdlmMKoDEMbxKrXxcYkgBnIh?from=from_copylink)
+
+
 
 *注：本项目repo在之前被建立初衷是为了入门llm，在Adventure X开幕当天正式作为团队项目repo*
 
