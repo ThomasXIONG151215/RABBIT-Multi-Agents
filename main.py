@@ -15,8 +15,8 @@ os.environ["MOONSHOT_API_KEY"] = "sk-wQJ6rfZixFKs8eKyPmAzXBfS1qdObnPbCIEoMyr6nq3
 
 
 st.set_page_config(
-   page_title="Mars PFAL AI App",
-   page_icon="🥬",
+   page_title="Rabbit Multi-Agents App",
+   page_icon="🐰",
    layout="wide",
    initial_sidebar_state="expanded",
 )
