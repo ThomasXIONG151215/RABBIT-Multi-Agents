@@ -57,13 +57,20 @@ with st.sidebar:
 
 
 if 'clicked' not in st.session_state:
-    st.session_state.clicked = {1: False}
+    st.session_state.clicked = {1: False,
+                                2: False,
+                                }
 
 # 初始化session state，如果它还不存在的话
 if 'new_info' not in st.session_state:
     st.session_state.new_info = ""
 
 state_new_info = st.session_state.new_info
+
+if 'ai_analyst_work' not in st.session_state:
+    st.session_state.ai_analyst_work = False
+
+ai_analyst_work = st.session_state.ai_analyst_work
 
 if 'ai_assistant_suggestion' not in st.session_state:
     st.session_state.ai_assistant_suggestion = ""
@@ -115,10 +122,10 @@ with st.expander('**数据可视化数据**'):
     canopy_fig = go.Figure()
     canopy_fig.add_trace(go.Scatter(x=df.index, y=df['Growth Rate (mm/day)'],
                             mode='lines', name='1号种植舱植物长势',
-                            line=dict(color='rgb(255, 99, 71)')))
+                            line=dict(color='rgb(83, 131, 146)')))
     canopy_fig.add_trace(go.Scatter(x=df.index, y=df['Growth Rate2 (mm/day)'],
                             mode='lines', name='2号种植舱植物长势',
-                            line=dict(color='rgb(255, 99, 71)')))
+                            line=dict(color='rgb(128, 185, 173)')))
     canopy_fig.update_layout(
         showlegend=True,  # 显示图例
         legend=dict(
@@ -141,10 +148,10 @@ with st.expander('**数据可视化数据**'):
     index_fig = go.Figure()
     index_fig.add_trace(go.Scatter(x=df.index, y=df['Harvest Index'],
                             mode='lines', name='1号种植舱收成指数',
-                            line=dict(color='rgb(255, 99, 71)')))
+                            line=dict(color='rgb(98, 149, 162)')))
     index_fig.add_trace(go.Scatter(x=df.index, y=df['Harvest Index2'],
                             mode='lines', name='2号种植舱收成指数',
-                            line=dict(color='rgb(255, 99, 71)')))
+                            line=dict(color='rgb(179, 226, 167)')))
     index_fig.update_layout(
         showlegend=True,  # 显示图例
         legend=dict(
@@ -220,7 +227,12 @@ with st.expander('**数据可视化数据**'):
     df = pd.DataFrame(data)
 
     # 创建Plotly Pie Chart
-    fig_pie = go.Figure(data=[go.Pie(labels=df['Energy Type'], values=df['Energy Consumption'])])
+    fig_pie = go.Figure(data=[go.Pie(labels=df['Energy Type'],
+                                     values=df['Energy Consumption'],
+                                     marker=dict(colors=['#4D869C', '#EEF7FF',
+                                                          '#96C9F4', '#7AB2B2',
+                                                            '#7AB2B2'])
+                                     )])
 
     # 更新图表布局
     fig_pie.update_layout(
@@ -255,24 +267,33 @@ st.header('AI Agent工作区')
 ai_analyst, ai_assistant, ai_mechanist = st.tabs(['AI数据分析师','AI助理农艺师','AI执行工程师'])
 
 with ai_analyst:
-    st.subheader('交互问答')
-    #new_knowledge = ""
-    prompt = st.chat_input('请输入你感兴趣的问题')
-    if prompt:
-        message, my_data_problem = manual_chat(prompt)
-        message.write(my_data_problem)
-        state_new_info += my_data_problem
-
+    new_knowledge = ""
     st.subheader('自动分析')
-    start_anal = st.button('开始回答预设问题', on_click=clicked, args=[1])
+    start_anal = st.button('开始回答预设问题'#, on_click=clicked, args=[1]
+                           )
 
-    with st.expander('自动分析'):
+    with st.expander('自动分析结果'):
         if start_anal:
+            ai_analyst_work = True
             combined_info = data_analysis()
 
             state_new_info += combined_info
             st.info('Done')
+        else:
+            st.write("")
     #st.write(new_knowledge)
+
+    st.subheader('补充问答')
+    
+    prompt = st.chat_input('请输入你感兴趣的问题')
+    with st.expander('补充提问回答'):
+        if prompt:
+            message, my_data_problem = manual_chat(prompt)
+            message.write(my_data_problem)
+            state_new_info += my_data_problem
+        else:
+            st.write(" ")
+
 
     st.subheader('保存新知识')
     store_info = st.button('按下保存分析结果作为新知识')
