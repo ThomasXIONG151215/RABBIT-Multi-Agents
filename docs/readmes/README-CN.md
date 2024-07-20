@@ -1,6 +1,6 @@
 <div align="center">
 <div align="center">
- <img alt="ASTRA" height="auto" src="./images/cover2.png">
+ <img alt="ASTRA" height="auto" src="../../images/cover2.png">
 </div>
 
 <a href="./README.md"><img alt="README in English" src="https://img.shields.io/badge/English-lightgrey"></a>
@@ -30,7 +30,7 @@
     * AI 执行工程师：与人类工程师合作，根据分析结果调整植物工厂设备参数。
 
 <div align="center">
-<img  alt="植物工厂数智可视化" src="./images/gif_data.gif">
+<img  alt="植物工厂数智可视化" src="../../images/gif_data.gif">
 </div>
 
 # 技术思路
@@ -47,25 +47,25 @@
 1. **AI 数据分析师**：负责对历史数据进行分析，统计不同种植参数的情况。然后将分析结果传送给 AI 助理农艺师。这里选择调用qwen-max来解析pandas dataframe。
 
 <div align="center">
-<img  alt="AI数据分析师" src="./images/gif_ai_analyst.gif">
+<img  alt="AI数据分析师" src="../../images/gif_ai_analyst.gif">
 </div>
 
 2. **AI 助理农艺师**：其职责是针对人类工程师希望解决的问题，先用标签缩小 RAG 文档的范围，从选定的知识文档中提炼知识，并结合前面的分析结果，对下一步的种植进行浅层分析和建议。为了处理大量内容，这里采用了 moonshot-v1-128k 模型进行长文本缓存工作。
 <div align="center">
-<img  alt="AI助理农艺师" src="./images/gif_ai_expert.gif">
+<img  alt="AI助理农艺师" src="../../images/gif_ai_expert.gif">
 </div>
 
 3. **AI 执行工程师**：负责首先根据前面的累积分析更新判断植物的最佳生长状况。当人类工程师批准方案后，执行植物工厂设备参数的调整和控制操作。
 
 <div align="center">
-<img  alt="AI执行工程师" src="./images/gif_ai_engineer.gif">
+<img  alt="AI执行工程师" src="../../images/gif_ai_engineer.gif">
 </div>
 
 
 **扬长避短**：通过上述工作流程，我们解放了人类工程师的双手，使他们能够将精力集中在判断上。同时，利用专业的多代理种植管理工作流，发挥了 LLM 的长文本处理和总结能力，并利用定制规则和 Moonshot 上下文缓存能力的 RAG 技术来抑制 LLM 的幻觉现象。
 
 <div align="center">
-<img  alt="设备控制面板" src="./images/gif_device_control.gif">
+<img  alt="设备控制面板" src="../../images/gif_device_control.gif">
 </div>
 
 # AdventureX期间项目启动所学新工具

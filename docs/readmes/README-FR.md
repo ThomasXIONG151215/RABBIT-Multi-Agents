@@ -1,6 +1,6 @@
 <div align="center">
 <div align="center">
- <img alt="ASTRA" height="auto" src="./images/cover2.png">
+ <img alt="ASTRA" height="auto" src="../../images/cover2.png">
 </div>
 
 <a href="./README.md"><img alt="README in English" src="https://img.shields.io/badge/English-lightgrey"></a>
@@ -27,7 +27,7 @@
     * Ingénieur d'Exécution IA : Collabore avec des ingénieurs humains pour ajuster les paramètres des équipements de l'usine de plantes en fonction des résultats d'analyse.
 
 <div align="center">
-<img  alt="Visualisation Intelligente des Usines de Plantes" src="./images/gif_data.gif">
+<img  alt="Visualisation Intelligente des Usines de Plantes" src="../../images/gif_data.gif">
 </div>
 
 # Approche Technique
@@ -44,24 +44,24 @@ Les trois points de test sont représentés par trois Agents IA interconnectés.
 1. **Analyste de Données IA** : Analyse les données historiques, résume les conditions de différents paramètres de plantation et envoie les résultats de l'analyse à l'Agronome Assistant IA. Ici, le modèle qwen-max est utilisé pour analyser les dataframes pandas.
 
 <div align="center">
-<img  alt="Analyste de Données IA" src="./images/gif_ai_analyst.gif">
+<img  alt="Analyste de Données IA" src="../../images/gif_ai_analyst.gif">
 </div>
 
 2. **Agronome Assistant IA** : Traite les problèmes que les ingénieurs humains veulent résoudre en réduisant d'abord la portée des documents RAG à l'aide d'étiquettes, en extrayant des connaissances des documents sélectionnés et en fournissant une analyse préliminaire et des recommandations pour la prochaine étape de plantation. Pour gérer une grande quantité de contenu, le modèle moonshot-v1-128k est utilisé pour la mise en cache de longs textes.
 <div align="center">
-<img  alt="Agronome Assistant IA" src="./images/gif_ai_expert.gif">
+<img  alt="Agronome Assistant IA" src="../../images/gif_ai_expert.gif">
 </div>
 
 3. **Ingénieur d'Exécution IA** : Met à jour et détermine les conditions de croissance optimales des plantes sur la base de l'analyse cumulative. Après approbation par les ingénieurs humains, il exécute les ajustements et le contrôle des paramètres des équipements de l'usine de plantes.
 
 <div align="center">
-<img  alt="Ingénieur d'Exécution IA" src="./images/gif_ai_engineer.gif">
+<img  alt="Ingénieur d'Exécution IA" src="../../images/gif_ai_engineer.gif">
 </div>
 
 **Exploiter les Points Forts et Éviter les Points Faibles** : Grâce au flux de travail ci-dessus, nous libérons les ingénieurs humains pour qu'ils se concentrent sur la prise de décision. En utilisant un flux de gestion de plantation multi-agent professionnel, nous exploitons les capacités de traitement et de résumé des longs textes du LLM et utilisons la technologie RAG avec des règles personnalisées et la mise en cache contextuelle de Moonshot pour atténuer les hallucinations du LLM.
 
 <div align="center">
-<img  alt="Panneau de Contrôle des Dispositifs" src="./images/gif_device_control.gif">
+<img  alt="Panneau de Contrôle des Dispositifs" src="../../images/gif_device_control.gif">
 </div>
 
 # Nouveaux Outils Appris Lors du Lancement du Projet AdventureX
