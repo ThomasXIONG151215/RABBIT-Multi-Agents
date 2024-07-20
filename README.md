@@ -26,16 +26,16 @@
     * AI Assistant Agronomist: Combines RAG documents and the AI Data Analyst’s results to offer planting recommendations, using the moonshot-v1-128k model for long text processing.
     * AI Implementation Engineer: Collaborates with human engineers to adjust plant factory equipment parameters based on the analysis results.
 
-<div align="center">
-<img  alt="Intelligent Visualization of Plant Factories" src="./images/gif_data.gif">
-</div>
-
 # Technical Approach
 
 This project aims to test the LLM's abilities in:
 1. Processing and analyzing long texts and data: Assessing its mathematical understanding and tool usage.
 2. Converting texts into actionable planting strategies: Evaluating how it extracts relevant professional documents from the knowledge base and provides scientific advice.
 3. Translating strategies into actual device control parameters: Determining if the LLM can generate specific values to control the equipment based on planting strategies.
+
+<div align="center">
+<img  alt="Ideal Automate Loop" src="./images/structure.png">
+</div>
 
 # Workflow Structure
 
