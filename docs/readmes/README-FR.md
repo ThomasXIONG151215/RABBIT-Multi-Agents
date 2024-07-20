@@ -3,9 +3,9 @@
  <img alt="ASTRA" height="auto" src="../../images/cover2.png">
 </div>
 
-<a href="./README.md"><img alt="README in English" src="https://img.shields.io/badge/English-lightgrey"></a>
-<a href="./docs/readmes/README-CN.md"><img alt="简体中文" src="https://img.shields.io/badge/简体中文-lightgrey"></a>
-<a href="./docs/readmes/README-FR.md"><img alt="Français" src="https://img.shields.io/badge/Français-lightgrey"></a>
+<a href="../../README.md"><img alt="README in English" src="https://img.shields.io/badge/English-lightgrey"></a>
+<a href=".README-CN.md"><img alt="简体中文" src="https://img.shields.io/badge/简体中文-lightgrey"></a>
+<a href=".README-FR.md"><img alt="Français" src="https://img.shields.io/badge/Français-lightgrey"></a>
 
 <a href="">
 <span>Exploitation Automatisée des Usines de Plantes</span>
