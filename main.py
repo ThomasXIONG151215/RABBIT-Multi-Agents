@@ -10,8 +10,8 @@ from langchain_community.document_loaders import UnstructuredMarkdownLoader
 from langchain_core.documents import Document
 from chat_tools import moonshot_llm
 
-os.environ["DASHSCOPE_API_KEY"] = "sk-a36dbf13c32f4b28a7dfc3ba81275fa8"
-os.environ["MOONSHOT_API_KEY"] = "sk-wQJ6rfZixFKs8eKyPmAzXBfS1qdObnPbCIEoMyr6nq3i4IMd"
+os.environ["DASHSCOPE_API_KEY"] = ""
+os.environ["MOONSHOT_API_KEY"] = ""
 
 
 st.set_page_config(
